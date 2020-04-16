@@ -51,9 +51,8 @@ resource "aws_route_table" "nat_gw" {
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = data.aws_internet_gateway.selected.id
+    gateway_id = data.aws_internet_gateway.selected.id
   }
-
   tags  = var.tags
 }
 
