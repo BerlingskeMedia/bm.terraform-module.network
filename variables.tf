@@ -18,6 +18,11 @@ variable "igw_id" {
   description = "Internet Gateway ID"
 }
 
+variable "nat_id" {
+  type        = string
+  description = "NAT Gateway ID"
+}
+
 variable "availability_zones" {
   type        = list(string)
   description = "List of availability zones"

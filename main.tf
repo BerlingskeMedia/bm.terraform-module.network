@@ -1,9 +1,13 @@
 data "aws_vpc" "selected" {
-  id = "${var.vpc_id}"
+  id = var.vpc_id
 }
 
 data "aws_internet_gateway" "selected" {
-  internet_gateway_id = "${var.igw_id}"
+  internet_gateway_id = var.igw_id
+}
+
+data "aws_nat_gateway" "selected" {
+  id = var.nat_id
 }
 
 
@@ -46,7 +50,17 @@ resource "aws_subnet" "pub-2" {
   tags                    = var.tags
 }
 
-resource "aws_route_table" "nat_gw" {
+resource "aws_route_table" "private_rt" {
+  vpc_id = data.aws_vpc.selected.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    gateway_id = data.aws_nat_gateway.selected.id
+  }
+  tags  = var.tags
+}
+
+resource "aws_route_table" "internet_rt" {
   vpc_id = data.aws_vpc.selected.id
 
   route {
@@ -56,11 +70,20 @@ resource "aws_route_table" "nat_gw" {
   tags  = var.tags
 }
 
-resource "aws_route_table_association" "subnet_1_to_nat_gw" {
-  route_table_id = aws_route_table.nat_gw.id
+resource "aws_route_table_association" "priv_1_to_nat_gw" {
+  route_table_id = aws_route_table.private_rt.id
   subnet_id      = aws_subnet.priv-1.id
 }
-resource "aws_route_table_association" "subnet_2_to_nat_gw" {
-  route_table_id = aws_route_table.nat_gw.id
+resource "aws_route_table_association" "priv_2_to_nat_gw" {
+  route_table_id = aws_route_table.private_rt.id
   subnet_id      = aws_subnet.priv-2.id
+}
+
+resource "aws_route_table_association" "pub_1_to_nat_gw" {
+  route_table_id = aws_route_table.internet_rt.id
+  subnet_id      = aws_subnet.pub-1
+}
+resource "aws_route_table_association" "pub_2_to_nat_gw" {
+  route_table_id = aws_route_table.internet_rt.id
+  subnet_id      = aws_subnet.pub-2.id
 }
