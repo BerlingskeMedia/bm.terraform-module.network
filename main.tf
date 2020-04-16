@@ -45,3 +45,23 @@ resource "aws_subnet" "pub-2" {
   map_public_ip_on_launch = true
   tags                    = var.tags
 }
+
+resource "aws_route_table" "nat_gw" {
+  vpc_id = data.aws_vpc.selected.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = data.aws_internet_gateway.selected.id
+  }
+
+  tags  = var.tags
+}
+
+resource "aws_route_table_association" "subnet_1_to_nat_gw" {
+  route_table_id = aws_route_table.nat_gw.id
+  subnet_id      = aws_subnet.priv-1.id
+}
+resource "aws_route_table_association" "subnet_2_to_nat_gw" {
+  route_table_id = aws_route_table.nat_gw.id
+  subnet_id      = aws_subnet.priv-2.id
+}
