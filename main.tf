@@ -55,7 +55,7 @@ resource "aws_route_table" "private_rt" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = data.aws_nat_gateway.selected.id
+    nat_gateway_id = data.aws_nat_gateway.selected.id
   }
   tags = var.tags
 }
