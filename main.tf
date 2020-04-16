@@ -54,20 +54,20 @@ resource "aws_route_table" "private_rt" {
   vpc_id = data.aws_vpc.selected.id
 
   route {
-    cidr_block     = "0.0.0.0/0"
+    cidr_block = "0.0.0.0/0"
     gateway_id = data.aws_nat_gateway.selected.id
   }
-  tags  = var.tags
+  tags = var.tags
 }
 
 resource "aws_route_table" "internet_rt" {
   vpc_id = data.aws_vpc.selected.id
 
   route {
-    cidr_block     = "0.0.0.0/0"
+    cidr_block = "0.0.0.0/0"
     gateway_id = data.aws_internet_gateway.selected.id
   }
-  tags  = var.tags
+  tags = var.tags
 }
 
 resource "aws_route_table_association" "priv_1_to_nat_gw" {
@@ -81,7 +81,7 @@ resource "aws_route_table_association" "priv_2_to_nat_gw" {
 
 resource "aws_route_table_association" "pub_1_to_nat_gw" {
   route_table_id = aws_route_table.internet_rt.id
-  subnet_id      = aws_subnet.pub-1
+  subnet_id      = aws_subnet.pub-1.id
 }
 resource "aws_route_table_association" "pub_2_to_nat_gw" {
   route_table_id = aws_route_table.internet_rt.id
