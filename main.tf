@@ -20,34 +20,43 @@ locals {
   pub2_cidr  = var.pub2_cidr == "" ? local.cidrs[3] : var.pub2_cidr
 }
 
+module "label" {
+  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.16.0"
+  namespace  = var.namespace
+  name       = var.name
+  stage      = var.stage
+  delimiter  = var.delimiter
+  attributes = var.attributes
+  tags       = var.tags
+}
 
 resource "aws_subnet" "priv-1" {
   vpc_id                  = data.aws_vpc.selected.id
   cidr_block              = local.priv1_cidr
   availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = false
-  tags                    = var.tags
+  tags = merge(var.tags, {"Name" = "${module.label.id}-priv-1"})
 }
 resource "aws_subnet" "priv-2" {
   vpc_id                  = data.aws_vpc.selected.id
   cidr_block              = local.priv2_cidr
   availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = false
-  tags                    = var.tags
+  tags = merge(var.tags, {"Name" = "${module.label.id}-piv-2"})
 }
 resource "aws_subnet" "pub-1" {
   vpc_id                  = data.aws_vpc.selected.id
   cidr_block              = local.pub1_cidr
   availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = true
-  tags                    = var.tags
+  tags = merge(var.tags, {"Name" = "${module.label.id}-pub-1"})
 }
 resource "aws_subnet" "pub-2" {
   vpc_id                  = data.aws_vpc.selected.id
   cidr_block              = local.pub2_cidr
   availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = true
-  tags                    = var.tags
+  tags = merge(var.tags, {"Name" = "${module.label.id}-pub-2"})
 }
 
 resource "aws_route_table" "private_rt" {
@@ -57,7 +66,7 @@ resource "aws_route_table" "private_rt" {
     cidr_block = "0.0.0.0/0"
     nat_gateway_id = data.aws_nat_gateway.selected.id
   }
-  tags = var.tags
+  tags = merge(var.tags, {"Name" = "${module.label.id}-private"})
 }
 
 resource "aws_route_table" "internet_rt" {
@@ -67,7 +76,7 @@ resource "aws_route_table" "internet_rt" {
     cidr_block = "0.0.0.0/0"
     gateway_id = data.aws_internet_gateway.selected.id
   }
-  tags = var.tags
+  tags = merge(var.tags, {"Name" = "${module.label.id}-internet"})
 }
 
 resource "aws_route_table_association" "priv_1_to_nat_gw" {

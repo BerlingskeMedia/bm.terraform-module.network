@@ -68,3 +68,17 @@ variable "pub2_cidr" {
   default     = ""
   description = "[optional] Manualy set CIDR for public network in AZ 2"
 }
+
+variable "delimiter" {
+  type        = string
+  default     = "-"
+  description = "Delimiter between `namespace`, `stage`, `name` and `attributes`"
+  #sane default
+}
+
+variable "attributes" {
+  type        = list(string)
+  description = "Additional attributes (_e.g._ \"1\")"
+  default     = []
+  #sane default
+}
