@@ -1,6 +1,6 @@
 output "public_subnets" {
   description = "List of public subnets' IDs"
-  value       = concat(aws_subnet.pub-1.id, aws_subnet.pub-2.id)
+  value       = concat(aws_subnet.pub-1.*.id, aws_subnet.pub-2.*.id)
 }
 
 output "private_subnets" {
