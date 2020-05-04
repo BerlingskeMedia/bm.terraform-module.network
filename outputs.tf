@@ -10,5 +10,5 @@ output "private_subnets" {
 
 output "vpc_id" {
   description = "VPC ID"
-  value       = data.aws_vpc.selected.id
+  value       = var.enabled ? join("", data.aws_vpc.selected.*.id) : var.vpc_id
 }

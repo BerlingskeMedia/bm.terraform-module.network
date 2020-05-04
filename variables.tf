@@ -7,7 +7,7 @@ variable "region" {
 variable "vpc_id" {
   type        = string
   description = "ID of vpc for this infrastructure"
-  default     = ""
+  default     = "vpc-00f92d0d578c6a298"
 }
 
 variable "app_cidr" {

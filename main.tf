@@ -1,19 +1,22 @@
 data "aws_vpc" "selected" {
-  id = var.vpc_id
+  count = var.enabled ? 1 : 0
+  id    = var.vpc_id
 }
 
 data "aws_internet_gateway" "selected" {
+  count               = var.enabled ? 1 : 0
   internet_gateway_id = var.igw_id
 }
 
 data "aws_nat_gateway" "selected" {
-  id = var.nat_id
+  count = var.enabled ? 1 : 0
+  id    = var.nat_id
 }
 
 
 
 locals {
-  cidrs      = var.enabled ? cidrsubnets(var.app_cidr, 2, 2, 2, 2) : ["","","",""]
+  cidrs      = var.enabled ? cidrsubnets(var.app_cidr, 2, 2, 2, 2) : ["", "", "", ""]
   priv1_cidr = var.priv1_cidr == "" ? local.cidrs[0] : var.priv1_cidr
   priv2_cidr = var.priv2_cidr == "" ? local.cidrs[1] : var.priv2_cidr
   pub1_cidr  = var.pub1_cidr == "" ? local.cidrs[2] : var.pub1_cidr
@@ -32,7 +35,7 @@ module "label" {
 
 resource "aws_subnet" "priv-1" {
   count                   = var.enabled ? 1 : 0
-  vpc_id                  = data.aws_vpc.selected.id
+  vpc_id                  = join("", data.aws_vpc.selected.*.id)
   cidr_block              = local.priv1_cidr
   availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = false
@@ -40,7 +43,7 @@ resource "aws_subnet" "priv-1" {
 }
 resource "aws_subnet" "priv-2" {
   count                   = var.enabled ? 1 : 0
-  vpc_id                  = data.aws_vpc.selected.id
+  vpc_id                  = join("", data.aws_vpc.selected.*.id)
   cidr_block              = local.priv2_cidr
   availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = false
@@ -48,7 +51,7 @@ resource "aws_subnet" "priv-2" {
 }
 resource "aws_subnet" "pub-1" {
   count                   = var.enabled ? 1 : 0
-  vpc_id                  = data.aws_vpc.selected.id
+  vpc_id                  = join("", data.aws_vpc.selected.*.id)
   cidr_block              = local.pub1_cidr
   availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = true
@@ -56,7 +59,7 @@ resource "aws_subnet" "pub-1" {
 }
 resource "aws_subnet" "pub-2" {
   count                   = var.enabled ? 1 : 0
-  vpc_id                  = data.aws_vpc.selected.id
+  vpc_id                  = join("", data.aws_vpc.selected.*.id)
   cidr_block              = local.pub2_cidr
   availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = true
@@ -65,22 +68,22 @@ resource "aws_subnet" "pub-2" {
 
 resource "aws_route_table" "private_rt" {
   count  = var.enabled ? 1 : 0
-  vpc_id = data.aws_vpc.selected.id
+  vpc_id = join("", data.aws_vpc.selected.*.id)
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = data.aws_nat_gateway.selected.id
+    nat_gateway_id = join("", data.aws_nat_gateway.selected.*.id)
   }
   tags = merge(var.tags, { "Name" = "${module.label.id}-private" })
 }
 
 resource "aws_route_table" "internet_rt" {
   count  = var.enabled ? 1 : 0
-  vpc_id = data.aws_vpc.selected.id
+  vpc_id = join("", data.aws_vpc.selected.*.id)
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = data.aws_internet_gateway.selected.id
+    gateway_id = join("", data.aws_internet_gateway.selected.*.id)
   }
   tags = merge(var.tags, { "Name" = "${module.label.id}-internet" })
 }
