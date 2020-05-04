@@ -13,7 +13,7 @@ data "aws_nat_gateway" "selected" {
 
 
 locals {
-  cidrs      = cidrsubnets(var.app_cidr, 2, 2, 2, 2)
+  cidrs      = var.enabled ? cidrsubnets(var.app_cidr, 2, 2, 2, 2) : ["","","",""]
   priv1_cidr = var.priv1_cidr == "" ? local.cidrs[0] : var.priv1_cidr
   priv2_cidr = var.priv2_cidr == "" ? local.cidrs[1] : var.priv2_cidr
   pub1_cidr  = var.pub1_cidr == "" ? local.cidrs[2] : var.pub1_cidr
