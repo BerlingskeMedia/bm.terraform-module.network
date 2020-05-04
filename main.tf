@@ -87,22 +87,22 @@ resource "aws_route_table" "internet_rt" {
 
 resource "aws_route_table_association" "priv_1_to_nat_gw" {
   count          = var.enabled ? 1 : 0
-  route_table_id = aws_route_table.private_rt.id
-  subnet_id      = aws_subnet.priv-1.id
+  route_table_id = join("", aws_route_table.private_rt.*.id)
+  subnet_id      = join("", aws_subnet.priv-1.*.id)
 }
 resource "aws_route_table_association" "priv_2_to_nat_gw" {
   count          = var.enabled ? 1 : 0
-  route_table_id = aws_route_table.private_rt.id
-  subnet_id      = aws_subnet.priv-2.id
+  route_table_id = join("", aws_route_table.private_rt.*.id)
+  subnet_id      = join("", aws_subnet.priv-2.*.id)
 }
 
 resource "aws_route_table_association" "pub_1_to_nat_gw" {
   count          = var.enabled ? 1 : 0
-  route_table_id = aws_route_table.internet_rt.id
-  subnet_id      = aws_subnet.pub-1.id
+  route_table_id = join("", aws_route_table.internet_rt.*.id)
+  subnet_id      = join("", aws_subnet.pub-1.*.id)
 }
 resource "aws_route_table_association" "pub_2_to_nat_gw" {
   count          = var.enabled ? 1 : 0
-  route_table_id = aws_route_table.internet_rt.id
-  subnet_id      = aws_subnet.pub-2.id
+  route_table_id = join("", aws_route_table.internet_rt.*.id)
+  subnet_id      = join("", aws_subnet.pub-2.*.id)
 }
