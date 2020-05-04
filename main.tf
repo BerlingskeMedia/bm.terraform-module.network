@@ -31,68 +31,78 @@ module "label" {
 }
 
 resource "aws_subnet" "priv-1" {
+  count                   = enabled ? 1 : 0
   vpc_id                  = data.aws_vpc.selected.id
   cidr_block              = local.priv1_cidr
   availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = false
-  tags = merge(var.tags, {"Name" = "${module.label.id}-priv-1"})
+  tags                    = merge(var.tags, { "Name" = "${module.label.id}-priv-1" })
 }
 resource "aws_subnet" "priv-2" {
+  count                   = enabled ? 1 : 0
   vpc_id                  = data.aws_vpc.selected.id
   cidr_block              = local.priv2_cidr
   availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = false
-  tags = merge(var.tags, {"Name" = "${module.label.id}-piv-2"})
+  tags                    = merge(var.tags, { "Name" = "${module.label.id}-piv-2" })
 }
 resource "aws_subnet" "pub-1" {
+  count                   = enabled ? 1 : 0
   vpc_id                  = data.aws_vpc.selected.id
   cidr_block              = local.pub1_cidr
   availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = true
-  tags = merge(var.tags, {"Name" = "${module.label.id}-pub-1"})
+  tags                    = merge(var.tags, { "Name" = "${module.label.id}-pub-1" })
 }
 resource "aws_subnet" "pub-2" {
+  count                   = enabled ? 1 : 0
   vpc_id                  = data.aws_vpc.selected.id
   cidr_block              = local.pub2_cidr
   availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = true
-  tags = merge(var.tags, {"Name" = "${module.label.id}-pub-2"})
+  tags                    = merge(var.tags, { "Name" = "${module.label.id}-pub-2" })
 }
 
 resource "aws_route_table" "private_rt" {
+  count  = enabled ? 1 : 0
   vpc_id = data.aws_vpc.selected.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = data.aws_nat_gateway.selected.id
   }
-  tags = merge(var.tags, {"Name" = "${module.label.id}-private"})
+  tags = merge(var.tags, { "Name" = "${module.label.id}-private" })
 }
 
 resource "aws_route_table" "internet_rt" {
+  count  = enabled ? 1 : 0
   vpc_id = data.aws_vpc.selected.id
 
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = data.aws_internet_gateway.selected.id
   }
-  tags = merge(var.tags, {"Name" = "${module.label.id}-internet"})
+  tags = merge(var.tags, { "Name" = "${module.label.id}-internet" })
 }
 
 resource "aws_route_table_association" "priv_1_to_nat_gw" {
+  count          = enabled ? 1 : 0
   route_table_id = aws_route_table.private_rt.id
   subnet_id      = aws_subnet.priv-1.id
 }
 resource "aws_route_table_association" "priv_2_to_nat_gw" {
+  count          = enabled ? 1 : 0
   route_table_id = aws_route_table.private_rt.id
   subnet_id      = aws_subnet.priv-2.id
 }
 
 resource "aws_route_table_association" "pub_1_to_nat_gw" {
+  count          = enabled ? 1 : 0
   route_table_id = aws_route_table.internet_rt.id
   subnet_id      = aws_subnet.pub-1.id
 }
 resource "aws_route_table_association" "pub_2_to_nat_gw" {
+  count          = enabled ? 1 : 0
   route_table_id = aws_route_table.internet_rt.id
   subnet_id      = aws_subnet.pub-2.id
 }
